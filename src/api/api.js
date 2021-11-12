@@ -3,10 +3,10 @@ import {LOGIN} from "../consts/auth.const";
 import {getStorage} from "../services/storage.service";
 
 // Test api URL
-const baseURL = `https://dev.foodworking.ru/api/v1/`;
+// const baseURL = `https://dev.foodworking.ru/api/v1/`;
 
 // Prod api URL
-// const baseURL = `https://api.foodworking.ru/api/v1/`;
+const baseURL = `https://api.foodworking.ru/api/v1/`;
 
 const axiosInstance = axios.create({
   baseURL,
