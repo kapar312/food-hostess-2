@@ -4,7 +4,7 @@ export class ReservesAction {
   getReservesData(lastDigitsOfNumber) {
     const params = {digits: lastDigitsOfNumber};
     return axiosInstance
-      .get("admin/reservations/by-phone-number", {params})
+      .get("hostess/reservations/by-phone-number", {params})
       .then(({data}) => {
         this.setReservesList(data);
       })
@@ -15,20 +15,13 @@ export class ReservesAction {
 
   reserveById(reservationId) {
     return axiosInstance
-      .post(`admin/reservations/${reservationId}/confirm`)
+      .post(`hostess/reservations/${reservationId}/checkin`)
       .then(() => {
         this.reservesList = this.reservesList.filter((item) => item.id !== reservationId);
       })
       .catch((err) => {
         throw err;
       });
-  }
-
-  testReserveById(reservationId) {
-    return new Promise((resolve, reject) => {
-      this.reservesList = this.reservesList.filter((item) => item.id !== reservationId);
-      resolve();
-    });
   }
 
   setReservesList(data) {

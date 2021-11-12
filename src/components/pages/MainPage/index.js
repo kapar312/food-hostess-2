@@ -38,7 +38,13 @@ const MainPage = inject("store")(
         .catch((error) => {
           setIsHasntReserves(true);
           if (error) {
-            setErrorText(error.data?.errors[0]);
+            if (error?.statusText?.length) {
+              setErrorText(error.statusText);
+            } else if (error.data?.errors?.length) {
+              setErrorText(error.data?.errors[0]);
+            } else {
+              setErrorText("Нет резарва на данный номер");
+            }
           } else toast.error("Непредвиденная ошибка. Поробуйте перезагрузить страницу.");
         });
     };
