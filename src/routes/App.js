@@ -22,7 +22,7 @@ export const App = () => {
           <Switch>
             <Route exact path={MAIN_PAGE} component={MainPageLayout} />
             <Route path={RESERVES_PAGE} component={ReservesPageLayout} />
-            <Route component={ErrorPageLayout} />
+            <Route path="*" component={ErrorPageLayout} />
           </Switch>
         </Router>
       </Provider>
