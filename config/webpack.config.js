@@ -106,8 +106,9 @@ module.exports = function (webpackEnv) {
     if (preProcessor) {
       loaders.push(
         {
-          loader: require.resolve("resolve-url-loader"),
+          loader: 'resolve-url-loader',
           options: {
+            removeCR: true,
             sourceMap: isEnvProduction && shouldUseSourceMap,
           },
         },
