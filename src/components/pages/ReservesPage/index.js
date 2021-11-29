@@ -36,47 +36,7 @@ const ReservesPage = inject("store")(
     };
     let query = useQuery();
 
-    useEffect(() => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-
-      intervalRef.current = setInterval(() => {
-        if (query.get("digits")) {
-          setFetching(true);
-          reserves.setLastDigitsOfNumber(query.get("digits"));
-          reserves
-            .getReservesData(query.get("digits"))
-            .catch((error) => {
-              if (error) {
-                if (error?.statusText?.length) {
-                  setErrorText(error.statusText);
-                } else if (error.data?.errors?.length) {
-                  setErrorText(error.data?.errors[0]);
-                } else {
-                  setErrorText("Нет резарва на данный номер");
-                }
-              } else
-                toast.error("Непредвиденная ошибка. Поробуйте перезагрузить страницу.");
-            })
-            .finally(() => {
-              setTimeout(() => {
-                setFetching(false);
-              }, 200);
-            });
-        }
-      }, 120000);
-
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-        reserves.setReservesList(null);
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
+    const getReservesData = () => {
       if (query.get("digits")) {
         setFetching(true);
         reserves.setLastDigitsOfNumber(query.get("digits"));
@@ -100,6 +60,24 @@ const ReservesPage = inject("store")(
             }, 200);
           });
       }
+    };
+
+    useEffect(() => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      intervalRef.current = setInterval(getReservesData, 120000);
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+        reserves.setReservesList(null);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+      getReservesData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query.get("digits")]);
 
