@@ -3,7 +3,7 @@ import {NavLink} from "react-router-dom";
 
 import arrow from "../../../../../common/images/svg/arrow.svg";
 
-const BreadCrumb = ({to, text}) => {
+const Breadcrumb = ({to, text}) => {
   return (
     <div className="reserves-page_head__wrapper">
       <NavLink to={to} className="reserves-page_head__back">
@@ -14,4 +14,4 @@ const BreadCrumb = ({to, text}) => {
   );
 };
 
-export default BreadCrumb;
+export default Breadcrumb;

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState, useRef} from "react";
 import {inject, observer} from "mobx-react";
 import {useLocation} from "react-router-dom";
 import {useMediaQuery} from "react-responsive";
@@ -7,14 +7,15 @@ import moment from "moment";
 
 import Layout from "../../segments/Layout";
 import ModalError from "../../modals/ModalError";
-import ButtonLink from "../../buttons/ButtonLink";
 import ModalSuccess from "../../modals/ModalSuccess";
 import ButtonPrimary from "../../buttons/ButtonPrimary";
 import {IconCalendar, IconCheck, IconNotice, IconUser} from "../../Icons";
 
-import TableSort from "./components/TableSort/TableSort";
-import BreadCrumb from "./components/BreadCrumb/BreadCrumb";
-import Alert from "./components/Alert/Alert";
+import TableSort from "./components/TableSort";
+import Breadcrumb from "./components/Breadcrumb";
+import Alert from "./components/Alert";
+import Skeleton from "./components/Skeleton";
+import Placeholder from "./components/Placeholder";
 
 import {formatLastDigits, formatPrice} from "./helpers";
 import {MAIN_PAGE} from "../../../consts/routes.const";
@@ -25,6 +26,7 @@ const ReservesPage = inject("store")(
     const [errorModalVisible, setErrorModalVisible] = useState(false);
     const [successModalVisible, setSuccessModalVisible] = useState(false);
     const [errorText, setErrorText] = useState("");
+    const intervalRef = useRef(null);
 
     const isBigTablet = useMediaQuery({minWidth: 768, maxWidth: 991});
     const isSmallTablet = useMediaQuery({minWidth: 320, maxWidth: 767});
@@ -34,7 +36,7 @@ const ReservesPage = inject("store")(
     };
     let query = useQuery();
 
-    useEffect(() => {
+    const getReservesData = () => {
       if (query.get("digits")) {
         setFetching(true);
         reserves.setLastDigitsOfNumber(query.get("digits"));
@@ -58,6 +60,24 @@ const ReservesPage = inject("store")(
             }, 200);
           });
       }
+    };
+
+    useEffect(() => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      intervalRef.current = setInterval(getReservesData, 120000);
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+        reserves.setReservesList(null);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+      getReservesData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query.get("digits")]);
 
@@ -76,7 +96,7 @@ const ReservesPage = inject("store")(
       );
     };
 
-    const reserve = (reserveId) => {
+    const doReserve = (reserveId) => {
       setFetching(true);
       reserves
         .reserveById(reserveId)
@@ -111,11 +131,19 @@ const ReservesPage = inject("store")(
           amount: () => formatPrice(item.price),
           action: () =>
             isSmallTablet ? (
-              <ButtonPrimary onClick={() => reserve(item.id)} buttonColor="primary">
+              <ButtonPrimary
+                onClick={() => doReserve(item.id)}
+                buttonColor="primary"
+                disabled={!item.canCheckIn}
+              >
                 <IconCheck color="#FFFFFF" />
               </ButtonPrimary>
             ) : (
-              <ButtonPrimary onClick={() => reserve(item.id)} buttonColor="primary">
+              <ButtonPrimary
+                onClick={() => doReserve(item.id)}
+                buttonColor="primary"
+                disabled={!item.canCheckIn}
+              >
                 Подтвердить
               </ButtonPrimary>
             ),
@@ -219,27 +247,12 @@ const ReservesPage = inject("store")(
 
     const content = useMemo(() => {
       if (fetching) {
-        return (
-          <div className="skeleton_list__wrapper">
-            <div className="skeleton_item__wrapper _head" />
-            <div className="skeleton_item__wrapper" />
-            <div className="skeleton_item__wrapper" />
-            <div className="skeleton_item__wrapper" />
-            <div className="skeleton_item__wrapper" />
-          </div>
-        );
+        return <Skeleton />;
       }
 
       if (reserves.reservesList?.length <= 0) {
         return (
-          <div className="reserves-page_placeholder__wrapper">
-            <p>Нет совпадений по номеру {reserves.lastDigitsOfNumber}</p>
-            <div className="reserves-page_placeholder__actions">
-              <ButtonLink hrefTo={MAIN_PAGE} buttonColor="primary">
-                На главную
-              </ButtonLink>
-            </div>
-          </div>
+          <Placeholder error={false} lastDigitsOfNumber={reserves.lastDigitsOfNumber} />
         );
       }
 
@@ -248,15 +261,11 @@ const ReservesPage = inject("store")(
       }
 
       return (
-        <div className="reserves-page_placeholder__wrapper">
-          <p>Ошибка по номеру {reserves.lastDigitsOfNumber}</p>
-          {errorText && <p>{errorText}</p>}
-          <div className="reserves-page_placeholder__actions">
-            <ButtonLink hrefTo={MAIN_PAGE} buttonColor="primary">
-              На главную
-            </ButtonLink>
-          </div>
-        </div>
+        <Placeholder
+          error={false}
+          errorText={errorText}
+          lastDigitsOfNumber={reserves.lastDigitsOfNumber}
+        />
       );
     }, [
       errorText,
@@ -272,7 +281,7 @@ const ReservesPage = inject("store")(
           <div className="reserves-page_wrapper">
             <div className="container container-full">
               <div className="reserves-page_inner-wrapper">
-                <BreadCrumb
+                <Breadcrumb
                   to={MAIN_PAGE}
                   text={`Резервы для номера **** ${formatLastDigits(
                     reserves.lastDigitsOfNumber
