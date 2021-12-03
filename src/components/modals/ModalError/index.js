@@ -37,10 +37,10 @@ const ModalError = inject("store")(
             в службу поддержки +7 (495) 120-02-31.
           </p>
           <div className={cn("modal_actions", `${classPrefix}_actions`)}>
-            <ButtonPrimary onClick={refreshPage} type="button" buttonColor="default">
+            <ButtonPrimary onClick={refreshPage} type="button" buttonColor="primary">
               Перезагрузить страницу
             </ButtonPrimary>
-            <ButtonPrimary onClick={onMainBtnClick} type="button" buttonColor="primary">
+            <ButtonPrimary onClick={onMainBtnClick} type="button" buttonColor="default">
               На главную
             </ButtonPrimary>
           </div>
