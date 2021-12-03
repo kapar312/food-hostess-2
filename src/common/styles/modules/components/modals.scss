@@ -83,13 +83,13 @@
 }
 
 .modal_wrapper.modal-error_wrapper {
-  .modal{
-    &_actions{
-      .btn-custom{
-        &:first-child{
+  .modal {
+    &_actions {
+      .btn-custom {
+        &:first-child {
           flex: 1 1 auto;
         }
-        &:last-child{
+        &:last-child {
           flex: 0 0 auto;
         }
       }
