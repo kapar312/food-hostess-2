@@ -24,8 +24,7 @@ const ModalSuccess = inject("store")(
             Бронь активирована
           </h3>
           <p className={cn("modal_text", `${classPrefix}_text`)}>
-            Теперь вы можете пройти за столик и комфортно работать в вашем любимом
-            ресторане!
+            Теперь гость может пройти за столик
           </p>
           <div className={cn("modal_actions", `${classPrefix}_actions`)}>
             <ButtonPrimary onClick={onMainBtnClick} type="button" buttonColor="primary">
